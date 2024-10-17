@@ -9,4 +9,5 @@
 *.dylib
 *.test
 *.out
+*.env
 /.idea

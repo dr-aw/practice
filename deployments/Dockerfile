@@ -17,6 +17,7 @@ FROM alpine:latest
 WORKDIR /root/
 
 COPY --from=builder /app/app-ololo .
+COPY --from=builder /app/templates ./templates
 
 # Listening port
 EXPOSE 8080

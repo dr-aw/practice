@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"time"
 )
@@ -20,12 +21,33 @@ func StartServer(gormdb *gorm.DB) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	db = gormdb
+
+	// renderer
+	renderer, err := initializeTemplates()
+	if err != nil {
+		log.Fatal("error initialize renderer: ", err)
+	}
+	e.Renderer = renderer
+
 	// endpoints
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Welcome to the API")
+		return c.Render(http.StatusOK, "base.html", map[string]interface{}{
+			"Title": "Home",
+		})
 	})
 
+	e.GET("/register", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "register.html", map[string]interface{}{
+			"Title": "Register",
+		})
+	})
 	e.POST("/register", register)
+
+	e.GET("/login", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "login.html", map[string]interface{}{
+			"Title": "Login",
+		})
+	})
 	e.POST("/login", login)
 	//e.GET("/list", listProducts)
 
@@ -47,22 +69,23 @@ func register(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "Could not register user")
 	}
 
-	return c.String(http.StatusOK, "User registered successfully")
+	return c.Render(http.StatusOK, "register.html", map[string]interface{}{
+		"Title":   "Registration Successful",
+		"Message": "User registered successfully",
+	})
 }
 
-// login обрабатывает аутентификацию пользователей
 func login(c echo.Context) error {
 	username, password, ok := c.Request().BasicAuth()
 	if !ok {
 		return echo.ErrUnauthorized
 	}
 
-	// Проверьте имя пользователя и пароль
 	if err := database.AuthUser(db, username, password); err != nil {
 		return echo.ErrUnauthorized
 	}
 
-	// Генерация JWT-токена
+	// JWT-generation
 	claims := jwt.MapClaims{
 		"username": username,
 		"exp":      time.Now().Add(time.Hour * 72).Unix(),
@@ -74,8 +97,9 @@ func login(c echo.Context) error {
 		return echo.ErrInternalServerError // Если не удалось подписать токен
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{
-		"token": signedToken,
+	return c.Render(http.StatusOK, "login.html", map[string]interface{}{
+		"Title": "Login Successful",
+		"Token": signedToken,
 	})
 }
 

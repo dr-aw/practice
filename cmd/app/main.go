@@ -1,13 +1,22 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/dr-aw/practice/internal/app"
 	"github.com/dr-aw/practice/internal/app/database"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	_, cancel := context.WithCancel(context.Background())
+
 	app.Run()
 	db, err := database.ConnectDB()
 	if err != nil {
@@ -27,5 +36,10 @@ func main() {
 	} else {
 		fmt.Printf("user added: %s", "user3")
 	}
+	<-signalChan
+	fmt.Println("Received shutdown signal")
+	cancel()
 
+	time.Sleep(2 * time.Second)
+	fmt.Println("Shutting down gracefully")
 }

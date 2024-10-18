@@ -2,10 +2,8 @@ package database
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 	"os"
 	"time"
 )
@@ -20,12 +18,12 @@ type User struct {
 // ConnectDB uses .env for connection to DB with GORM
 func ConnectDB() (*gorm.DB, error) {
 	// Read .env
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error load .env file: %v", err)
-	}
+	//err := godotenv.Load()
+	//if err != nil {
+	//	log.Fatalf("Error load .env file: %v", err)
+	//}
 
-	dbHost := "192.168.1.2"
+	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")

@@ -7,12 +7,14 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"os"
+	"time"
 )
 
 type User struct {
-	ID           uint   `gorm:"primaryKey"`
-	Username     string `gorm:"unique;not null"`
-	PasswordHash string `gorm:"not null"`
+	ID           uint      `gorm:"primaryKey"`
+	Username     string    `gorm:"unique;not null"`
+	PasswordHash string    `gorm:"not null"`
+	CreatedAt    time.Time `gorm:"autoCreateTime"`
 }
 
 // ConnectDB uses .env for connection to DB with GORM
@@ -23,7 +25,7 @@ func ConnectDB() (*gorm.DB, error) {
 		log.Fatalf("Error load .env file: %v", err)
 	}
 
-	dbHost := "192.168.0.154"
+	dbHost := "192.168.1.2"
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")

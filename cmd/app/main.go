@@ -15,11 +15,17 @@ func main() {
 	}
 
 	fmt.Println("DB connected successfully:", db)
-	username := "admin"
-	password := "mySecretPassword"
-	if err := database.AuthUser(db, username, password); err != nil {
+	//username := "admin"
+	//password := "mySecretPassword"
+	//if err := database.AuthUser(db, username, password); err != nil {
+	//	log.Println(err)
+	//} else {
+	//	fmt.Printf("login succeed: %s", username)
+	//}
+	if err := database.AddUser(db, "user3", "43214321"); err != nil {
 		log.Println(err)
 	} else {
-		fmt.Printf("login succeed: %s", username)
+		fmt.Printf("user added: %s", "user3")
 	}
+
 }
